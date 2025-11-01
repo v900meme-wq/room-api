@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique @db.VarChar(50)
+  password   String   @db.VarChar(255)
+  phone      String   @db.VarChar(10)
+  roomLimit  Int?     @map("room_limit") @db.SmallInt
+  status     Boolean  @default(true)
+  isAdmin    Boolean  @default(false) @map("is_admin")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  houses House[]
+
+  @@map("user")
+}
+
+model House {
+  id      Int    @id @default(autoincrement())
+  address String @db.Text
+  note    String @db.Text
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  rooms Room[]
+
+  @@map("house")
+}
+
+model Room {
+  id                 Int      @id @default(autoincrement())
+  roomName           String   @map("room_name") @db.VarChar(100)
+  renter             String   @db.VarChar(100)
+  phone              String   @db.VarChar(10)
+  area               Decimal  @db.Decimal(6, 2)
+  status             String   @db.VarChar(20)
+  roomPrice          Decimal  @map("room_price") @db.Decimal(10, 2)
+  electPrice         Decimal  @map("elect_price") @db.Decimal(8, 2)
+  waterPrice         Decimal  @map("water_price") @db.Decimal(8, 2)
+  trashFee           Decimal  @map("trash_fee") @db.Decimal(8, 2)
+  washingMachineFee  Decimal  @map("washing_machine_fee") @db.Decimal(8, 2)
+  elevatorFee        Decimal  @map("elevator_fee") @db.Decimal(8, 2)
+  rentedAt           DateTime @map("rented_at") @db.Timestamptz()
+  deposit            Decimal  @db.Decimal(10, 2)
+  note               String   @db.Text
+
+  houseId Int   @map("house_id")
+  house   House @relation(fields: [houseId], references: [id])
+
+  monthlyPayments MonthlyPayment[]
+
+  @@map("room")
+}
+
+model MonthlyPayment {
+  id          Int      @id @default(autoincrement())
+  electStart  Int      @map("elect_start")
+  electEnd    Int      @map("elect_end")
+  waterStart  Int      @map("water_start")
+  waterEnd    Int      @map("water_end")
+  month       Int      @db.SmallInt
+  year        Int      @db.SmallInt
+  roomPrice          Decimal  @map("room_price") @db.Decimal(10, 2)
+  electPrice         Decimal  @map("elect_price") @db.Decimal(8, 2)
+  waterPrice         Decimal  @map("water_price") @db.Decimal(8, 2)
+  trashFee           Decimal  @map("trash_fee") @db.Decimal(8, 2)
+  washingMachineFee  Decimal  @map("washing_machine_fee") @db.Decimal(8, 2)
+  elevatorFee        Decimal  @map("elevator_fee") @db.Decimal(8, 2)
+  totalAmount Decimal  @map("total_amount") @db.Decimal(12, 2)
+  status      String   @db.VarChar(20)
+  note        String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  roomId Int  @map("room_id")
+  room   Room @relation(fields: [roomId], references: [id])
+
+  @@unique([roomId, month, year])
+  @@map("monthly_payment")
+}
+
+model AuditLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int?     @map("user_id")
+  username    String   @db.VarChar(50)
+  action      String   @db.VarChar(50)
+  entity      String   @db.VarChar(50)
+  entityId    Int?     @map("entity_id")
+  oldValue    String?  @map("old_value") @db.Text
+  newValue    String?  @map("new_value") @db.Text
+  ipAddress   String   @map("ip_address") @db.VarChar(50)
+  userAgent   String?  @map("user_agent") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@map("audit_log")
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
