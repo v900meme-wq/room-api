@@ -21,7 +21,7 @@ async function bootstrap() {
   // Apply throttle exception filter
   app.useGlobalFilters(new ThrottlerExceptionFilter());
 
-  await app.listen(3000);
-  console.log('🚀 Server is running on http://localhost:3000');
+  await app.listen(3003);
+  console.log('🚀 Server is running on http://localhost:3003');
 }
 bootstrap();
