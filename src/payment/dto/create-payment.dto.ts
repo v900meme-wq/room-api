@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, Min, Max, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, Min, Max, IsString, IsOptional } from 'class-validator';
 
 export class CreatePaymentDto {
     @IsInt()
@@ -34,7 +34,7 @@ export class CreatePaymentDto {
     status: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     note: string;
 
     @IsInt()

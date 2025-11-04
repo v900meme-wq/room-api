@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsInt, IsNumber, IsDateString } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsNumber, IsDateString, IsOptional } from 'class-validator';
 
 export class CreateRoomDto {
     @IsString()
@@ -54,7 +54,7 @@ export class CreateRoomDto {
     deposit: number;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     note: string;
 
     @IsInt()
