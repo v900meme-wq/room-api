@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsOptional } from 'class-validator';
 
 export class CreateHouseDto {
     @IsString()
@@ -6,7 +6,7 @@ export class CreateHouseDto {
     address: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     note: string;
 
     @IsInt()
