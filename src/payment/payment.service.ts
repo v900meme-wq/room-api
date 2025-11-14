@@ -23,12 +23,12 @@ export class PaymentService {
         const electUsage = electEnd - electStart;
         const waterUsage = waterEnd - waterStart;
 
-        if (electUsage < 0) {
-            throw new BadRequestException('Electric end must be greater than or equal to electric start');
+        if (electUsage < 0) { // Electric end must be greater than or equal to electric start
+            throw new BadRequestException('Số điện mới phải lớn hơn hoặc bằng số điện cũ');
         }
 
-        if (waterUsage < 0) {
-            throw new BadRequestException('Water end must be greater than or equal to water start');
+        if (waterUsage < 0) { // Water end must be greater than or equal to water start
+            throw new BadRequestException('Số nước mới phải lớn hơn hoặc bằng số nước cũ');
         }
 
         const total =
@@ -52,13 +52,16 @@ export class PaymentService {
         });
 
         if (!room) {
-            throw new NotFoundException('Room not found');
+            throw new NotFoundException('Không tìm thấy phòng');
         }
 
         // Non-admin users can only create payments for rooms in their own houses
         if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only create payments for rooms in your own houses');
+            throw new ForbiddenException('Bạn chỉ có thể tạo hóa đơn cho phòng của bạn');
         }
+        // if (room.house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only create payments for rooms in your own houses');
+        // }
 
         // Check if payment already exists for this room/month/year
         const existingPayment = await this.prisma.monthlyPayment.findUnique({
@@ -72,8 +75,8 @@ export class PaymentService {
         });
 
         if (existingPayment) {
-            throw new ConflictException(
-                `Payment for room ${room.roomName} in ${dto.month}/${dto.year} already exists`,
+            throw new ConflictException( // Payment for room ${room.roomName} in ${dto.month}/${dto.year} already exists
+                `Hóa đơn phòng ${room.roomName} của tháng ${dto.month}/${dto.year} đã tồn tại`,
             );
         }
 
@@ -147,8 +150,8 @@ export class PaymentService {
                     },
                 });
 
-                if (!room) {
-                    throw new ForbiddenException('You can only view payments for rooms in your own houses');
+                if (!room) { // You can only view payments for rooms in your own houses
+                    throw new ForbiddenException('Bạn chỉ có thể xem hóa đơn ');
                 }
             }
 
@@ -222,8 +225,8 @@ export class PaymentService {
 
         // Non-admin users can only view payments for rooms in their own houses
         if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only view payments for rooms in your own houses');
-        }
+            throw new ForbiddenException('Bạn chỉ có thể xem hóa đơn của bạn');
+        } // You can only view payments for rooms in your own houses
 
         // Get 5 most recent payments
         const payments = await this.prisma.monthlyPayment.findMany({
@@ -305,8 +308,8 @@ export class PaymentService {
 
         // Non-admin users can only view payments for rooms in their own houses
         if (!currentUser.isAdmin && payment.room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only view payments for rooms in your own houses');
-        }
+            throw new ForbiddenException('Bạn chỉ có thể xem hóa đơn của bạn');
+        } // You can only view payments for rooms in your own houses
 
         // Convert Decimal to number
         return {
@@ -339,13 +342,13 @@ export class PaymentService {
         });
 
         if (!payment) {
-            throw new NotFoundException('Payment not found');
+            throw new NotFoundException('Không tìm thấy hóa đơn');
         }
 
         // Non-admin users can only update payments for rooms in their own houses
         if (!currentUser.isAdmin && payment.room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only update payments for rooms in your own houses');
-        }
+            throw new ForbiddenException('Bạn chỉ có thể cập nhật hóa đơn của bạn');
+        } // You can only update payments for rooms in your own houses
 
         // If month or year is changed, check for conflicts
         if ((dto.month && dto.month !== payment.month) || (dto.year && dto.year !== payment.year)) {
@@ -440,16 +443,16 @@ export class PaymentService {
         });
 
         if (!payment) {
-            throw new NotFoundException('Payment not found');
+            throw new NotFoundException('Không tìm thấy hóa đơn');
         }
 
         // Non-admin users can only delete payments for rooms in their own houses
         if (!currentUser.isAdmin && payment.room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only delete payments for rooms in your own houses');
-        }
+            throw new ForbiddenException('Bạn chỉ có thể xóa hóa đơn của bạn');
+        } // You can only delete payments for rooms in your own houses
 
         await this.prisma.monthlyPayment.delete({ where: { id } });
 
-        return { message: 'Payment deleted successfully' };
+        return { message: 'Xóa hóa đơn thành công' }; // Payment deleted successfully
     }
 }

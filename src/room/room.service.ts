@@ -21,7 +21,10 @@ export class RoomService {
         }
 
         // Non-admin users can only create rooms in their own houses
-        if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        // if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only create rooms in your own houses');
+        // }
+        if (house.userId !== currentUser.id) {
             throw new ForbiddenException('You can only create rooms in your own houses');
         }
 
@@ -63,35 +66,21 @@ export class RoomService {
         return room;
     }
 
-    async findAll(currentUser: any, houseId?: number) {
-        // If no houseId provided, only admin can view all rooms
-        if (!houseId && !currentUser.isAdmin) {
-            throw new ForbiddenException('Only admin can view all rooms. Please provide houseId parameter.');
+    async findAll(currentUser: any, houseId: number) {
+        const house = await this.prisma.house.findFirst({
+            where: {
+                id: houseId,
+                userId: currentUser.id,
+            },
+        });
+
+        if (!house) {
+            throw new ForbiddenException('You can only view rooms in your own houses');
         }
 
-        // Build where clause
-        const where: any = {};
-
-        // If houseId is provided, filter by house
-        if (houseId) {
-            // Check if house belongs to user (non-admin)
-            if (!currentUser.isAdmin) {
-                const house = await this.prisma.house.findFirst({
-                    where: {
-                        id: houseId,
-                        userId: currentUser.id,
-                    },
-                });
-
-                if (!house) {
-                    throw new ForbiddenException('You can only view rooms in your own houses');
-                }
-            }
-
-            where.houseId = houseId;
-        } else {
-            // Admin viewing all rooms - no additional filter needed
-        }
+        const where = {
+            houseId,
+        };
 
         const rooms = await this.prisma.room.findMany({
             where,
@@ -128,6 +117,51 @@ export class RoomService {
             deposit: Number(room.deposit),
         }));
     }
+
+    async findAllByUser(currentUser: any) {
+        // Lấy tất cả house của user
+        const houses = await this.prisma.house.findMany({
+            where: { userId: currentUser.id },
+            select: { id: true },
+        });
+
+        const houseIds = houses.map(h => h.id);
+
+        if (houseIds.length === 0) {
+            return [];
+        }
+
+        const rooms = await this.prisma.room.findMany({
+            where: {
+                houseId: { in: houseIds },
+            },
+            include: {
+                house: {
+                    select: {
+                        id: true,
+                        address: true,
+                    },
+                },
+                _count: {
+                    select: { monthlyPayments: true },
+                },
+            },
+            orderBy: { id: 'desc' },
+        });
+
+        return rooms.map(room => ({
+            ...room,
+            area: Number(room.area),
+            roomPrice: Number(room.roomPrice),
+            electPrice: Number(room.electPrice),
+            waterPrice: Number(room.waterPrice),
+            trashFee: Number(room.trashFee),
+            washingMachineFee: Number(room.washingMachineFee),
+            elevatorFee: Number(room.elevatorFee),
+            deposit: Number(room.deposit),
+        }));
+    }
+
 
     async findOne(id: number, currentUser: any) {
         const room = await this.prisma.room.findUnique({
@@ -167,8 +201,11 @@ export class RoomService {
         }
 
         // Non-admin users can only view rooms in their own houses
-        if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only view rooms in your own houses');
+        // if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only view rooms in your own houses');
+        // }
+        if (room.house.userId !== currentUser.id) {
+            throw new ForbiddenException('Bạn chỉ có thể xem phòng của nhà bạn');
         }
 
         // Convert Decimal to number
@@ -202,8 +239,11 @@ export class RoomService {
         }
 
         // Non-admin users can only update rooms in their own houses
-        if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only update rooms in your own houses');
+        // if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only update rooms in your own houses');
+        // }
+        if (room.house.userId !== currentUser.id) {
+            throw new ForbiddenException('Bạn chỉ có thể cập nhật phòng của nhà bạn');
         }
 
         // If changing houseId, check new house
@@ -218,8 +258,11 @@ export class RoomService {
             }
 
             // Non-admin can only move to their own houses
-            if (!currentUser.isAdmin && newHouse.userId !== currentUser.id) {
-                throw new ForbiddenException('You can only move rooms to your own houses');
+            // if (!currentUser.isAdmin && newHouse.userId !== currentUser.id) {
+            //     throw new ForbiddenException('You can only move rooms to your own houses');
+            // }
+            if (newHouse.userId !== currentUser.id) {
+                throw new ForbiddenException('Bạn chỉ có thể di chuyển phòng tới nhà khác của bạn');
             }
 
             // Check room limit for new house's user
@@ -234,7 +277,7 @@ export class RoomService {
 
                 if (newUserRoomsCount >= newHouse.user.roomLimit) {
                     throw new BadRequestException(
-                        `Target user has reached the maximum number of rooms (${newHouse.user.roomLimit})`,
+                        `Bạn đã đạt đến số lượng phòng tối đa (${newHouse.user.roomLimit})`,
                     );
                 }
             }
@@ -275,8 +318,11 @@ export class RoomService {
         }
 
         // Non-admin users can only delete rooms in their own houses
-        if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
-            throw new ForbiddenException('You can only delete rooms in your own houses');
+        // if (!currentUser.isAdmin && room.house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only delete rooms in your own houses');
+        // }
+        if (room.house.userId !== currentUser.id) {
+            throw new ForbiddenException('Bạn chỉ có thể xóa phòng của nhà bạn');
         }
 
         // Check if room has payments

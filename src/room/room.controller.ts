@@ -29,9 +29,15 @@ export class RoomController {
     }
 
     @Get()
-    findAll(@Request() req, @Query('houseId') houseId?: string) {
-        const houseIdNum = houseId ? parseInt(houseId, 10) : undefined;
+    findAll(@Request() req, @Query('houseId') houseId: string) {
+        // const houseIdNum = houseId ? parseInt(houseId, 10) : undefined;
+        const houseIdNum = parseInt(houseId, 10);
         return this.roomService.findAll(req.user, houseIdNum);
+    }
+
+    @Get("user")
+    async getAllRoomsByUser(@Request() req) {
+        return this.roomService.findAllByUser(req.user);
     }
 
     @Get(':id')

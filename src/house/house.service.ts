@@ -18,7 +18,10 @@ export class HouseService {
         }
 
         // Non-admin users can only create houses for themselves
-        if (!currentUser.isAdmin && dto.userId !== currentUser.id) {
+        // if (!currentUser.isAdmin && dto.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only create houses for yourself');
+        // }
+        if (dto.userId !== currentUser.id) {
             throw new ForbiddenException('You can only create houses for yourself');
         }
 
@@ -46,7 +49,8 @@ export class HouseService {
 
     async findAll(currentUser: any) {
         // Admin sees all houses, regular users only see their own
-        const where = currentUser.isAdmin ? {} : { userId: currentUser.id };
+        // const where = currentUser.isAdmin ? {} : { userId: currentUser.id };
+        const where = { userId: currentUser.id };
 
         return this.prisma.house.findMany({
             where,
@@ -99,7 +103,10 @@ export class HouseService {
         }
 
         // Non-admin users can only view their own houses
-        if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        // if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only view your own houses');
+        // }
+        if (house.userId !== currentUser.id) {
             throw new ForbiddenException('You can only view your own houses');
         }
 
@@ -116,7 +123,10 @@ export class HouseService {
         }
 
         // Non-admin users can only update their own houses
-        if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        // if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only update your own houses');
+        // }
+        if (house.userId !== currentUser.id) {
             throw new ForbiddenException('You can only update your own houses');
         }
 
@@ -174,7 +184,10 @@ export class HouseService {
         }
 
         // Non-admin users can only delete their own houses
-        if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        // if (!currentUser.isAdmin && house.userId !== currentUser.id) {
+        //     throw new ForbiddenException('You can only delete your own houses');
+        // }
+        if (house.userId !== currentUser.id) {
             throw new ForbiddenException('You can only delete your own houses');
         }
 
