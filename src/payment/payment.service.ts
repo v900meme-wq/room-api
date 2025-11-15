@@ -19,6 +19,7 @@ export class PaymentService {
         trashFee: Decimal,
         washingMachineFee: Decimal,
         elevatorFee: Decimal,
+        parkingFee: Decimal,
     ): number {
         const electUsage = electEnd - electStart;
         const waterUsage = waterEnd - waterStart;
@@ -37,7 +38,8 @@ export class PaymentService {
             waterUsage * Number(waterPrice) +
             Number(trashFee) +
             Number(washingMachineFee) +
-            Number(elevatorFee);
+            Number(elevatorFee) +
+            Number(parkingFee);
 
         return total;
     }
@@ -92,6 +94,7 @@ export class PaymentService {
             room.trashFee,
             room.washingMachineFee,
             room.elevatorFee,
+            room.parkingFee ?? new Decimal(0),
         );
 
         const payment = await this.prisma.monthlyPayment.create({
@@ -103,6 +106,7 @@ export class PaymentService {
                 trashFee: room.trashFee,
                 washingMachineFee: room.washingMachineFee,
                 elevatorFee: room.elevatorFee,
+                parkingFee: room.parkingFee,
                 totalAmount,
             },
             include: {
@@ -390,6 +394,7 @@ export class PaymentService {
                 payment.room.electPrice,
                 payment.room.waterPrice,
                 payment.room.trashFee,
+                payment.room.parkingFee ?? Decimal(0),
                 payment.room.washingMachineFee,
                 payment.room.elevatorFee,
             );

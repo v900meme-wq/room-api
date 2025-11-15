@@ -39,6 +39,10 @@ export class UpdateRoomDto {
 
     @IsNumber()
     @IsOptional()
+    parkingFee?: number;
+
+    @IsNumber()
+    @IsOptional()
     washingMachineFee?: number;
 
     @IsNumber()

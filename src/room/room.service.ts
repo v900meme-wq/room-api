@@ -112,6 +112,7 @@ export class RoomService {
             electPrice: Number(room.electPrice),
             waterPrice: Number(room.waterPrice),
             trashFee: Number(room.trashFee),
+            parkingFee: Number(room.parkingFee),
             washingMachineFee: Number(room.washingMachineFee),
             elevatorFee: Number(room.elevatorFee),
             deposit: Number(room.deposit),

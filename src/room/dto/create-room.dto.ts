@@ -39,6 +39,10 @@ export class CreateRoomDto {
 
     @IsNumber()
     @IsNotEmpty()
+    parkingFee: number;
+
+    @IsNumber()
+    @IsNotEmpty()
     washingMachineFee: number;
 
     @IsNumber()
