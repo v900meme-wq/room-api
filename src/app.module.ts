@@ -16,18 +16,18 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
     ThrottlerModule.forRoot([
       {
         name: 'short',
-        ttl: 1000,
-        limit: 1,
+        ttl: 1000, // 1 second
+        limit: 5,
       },
       {
         name: 'medium',
-        ttl: 10000, // đơn vị ms
-        limit: 5,   // số lần gọi -> 5 request / 10
+        ttl: 10000, // 10 seconds
+        limit: 15, // 15 requests / 10 seconds
       },
       {
         name: 'long',
-        ttl: 60000,
-        limit: 20,
+        ttl: 60000, // 60 seconds
+        limit: 60, // 60 requests / 60 seconds
       },
     ]),
     PrismaModule,
