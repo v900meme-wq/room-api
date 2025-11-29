@@ -333,7 +333,7 @@ export class RoomService {
 
         if (paymentsCount > 0) {
             throw new BadRequestException(
-                'Cannot delete room with existing payments. Please delete all payments first.',
+                'Không thể xóa phòng. Phải xóa các hóa đơn của phòng này trước',
             );
         }
 
