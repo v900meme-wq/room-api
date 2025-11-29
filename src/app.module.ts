@@ -9,6 +9,7 @@ import { RoomModule } from './room/room.module';
 import { PaymentModule } from './payment/payment.module';
 import { AuditLogModule } from './audit-log/audit-log.module';
 import { AdminModule } from './admin/admin.module';
+import { PriceModule } from './price/price.module';  // ← Thêm dòng này
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
 
 @Module({
@@ -16,18 +17,18 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
     ThrottlerModule.forRoot([
       {
         name: 'short',
-        ttl: 1000, // 1 second
+        ttl: 1000,
         limit: 5,
       },
       {
         name: 'medium',
-        ttl: 10000, // 10 seconds
-        limit: 15, // 15 requests / 10 seconds
+        ttl: 10000,
+        limit: 15,
       },
       {
         name: 'long',
-        ttl: 60000, // 60 seconds
-        limit: 60, // 60 requests / 60 seconds
+        ttl: 60000,
+        limit: 60,
       },
     ]),
     PrismaModule,
@@ -36,8 +37,9 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
     HouseModule,
     RoomModule,
     PaymentModule,
-    AuditLogModule,    // ← New
-    AdminModule,        // ← New
+    AuditLogModule,
+    AdminModule,
+    PriceModule,  // ← Thêm dòng này
   ],
   providers: [
     {
@@ -46,7 +48,7 @@ import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: AuditLogInterceptor,  // ← New
+      useClass: AuditLogInterceptor,
     },
   ],
 })

@@ -7,6 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Thêm model Price vào schema
+model Price {
+  id                Int     @id @default(autoincrement())
+  priceName         String  @map("price_name") @db.VarChar(50)
+  roomPrice         Decimal @map("room_price") @db.Decimal(10, 2)
+  electPrice        Decimal @map("elect_price") @db.Decimal(8, 2)
+  waterPrice        Decimal @map("water_price") @db.Decimal(8, 2)
+  trashFee          Decimal @map("trash_fee") @db.Decimal(8, 2)
+  washingMachineFee Decimal @map("washing_machine_fee") @db.Decimal(8, 2)
+  elevatorFee       Decimal @map("elevator_fee") @db.Decimal(8, 2)
+  deposit           Decimal @db.Decimal(10, 2)
+
+  @@map("price")
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   username   String   @unique @db.VarChar(50)
@@ -47,7 +62,7 @@ model Room {
   electPrice         Decimal  @map("elect_price") @db.Decimal(8, 2)
   waterPrice         Decimal  @map("water_price") @db.Decimal(8, 2)
   trashFee           Decimal  @map("trash_fee") @db.Decimal(8, 2)
-  parkingFee         Decimal?  @map("parking_fee") @db.Decimal(8, 2)
+  parkingFee         Decimal? @map("parking_fee") @db.Decimal(8, 2)
   washingMachineFee  Decimal  @map("washing_machine_fee") @db.Decimal(8, 2)
   elevatorFee        Decimal  @map("elevator_fee") @db.Decimal(8, 2)
   rentedAt           DateTime @map("rented_at") @db.Timestamptz()
@@ -63,24 +78,24 @@ model Room {
 }
 
 model MonthlyPayment {
-  id          Int      @id @default(autoincrement())
-  electStart  Int      @map("elect_start")
-  electEnd    Int      @map("elect_end")
-  waterStart  Int      @map("water_start")
-  waterEnd    Int      @map("water_end")
-  month       Int      @db.SmallInt
-  year        Int      @db.SmallInt
+  id                 Int      @id @default(autoincrement())
+  electStart         Int      @map("elect_start")
+  electEnd           Int      @map("elect_end")
+  waterStart         Int      @map("water_start")
+  waterEnd           Int      @map("water_end")
+  month              Int      @db.SmallInt
+  year               Int      @db.SmallInt
   roomPrice          Decimal  @map("room_price") @db.Decimal(10, 2)
   electPrice         Decimal  @map("elect_price") @db.Decimal(8, 2)
   waterPrice         Decimal  @map("water_price") @db.Decimal(8, 2)
   trashFee           Decimal  @map("trash_fee") @db.Decimal(8, 2)
-  parkingFee         Decimal?  @map("parking_fee") @db.Decimal(8, 2)
+  parkingFee         Decimal? @map("parking_fee") @db.Decimal(8, 2)
   washingMachineFee  Decimal  @map("washing_machine_fee") @db.Decimal(8, 2)
   elevatorFee        Decimal  @map("elevator_fee") @db.Decimal(8, 2)
-  totalAmount Decimal  @map("total_amount") @db.Decimal(12, 2)
-  status      String   @db.VarChar(20)
-  note        String   @db.Text
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  totalAmount        Decimal  @map("total_amount") @db.Decimal(12, 2)
+  status             String   @db.VarChar(20)
+  note               String   @db.Text
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
   roomId Int  @map("room_id")
   room   Room @relation(fields: [roomId], references: [id])
@@ -90,17 +105,17 @@ model MonthlyPayment {
 }
 
 model AuditLog {
-  id          Int      @id @default(autoincrement())
-  userId      Int?     @map("user_id")
-  username    String   @db.VarChar(50)
-  action      String   @db.VarChar(50)
-  entity      String   @db.VarChar(50)
-  entityId    Int?     @map("entity_id")
-  oldValue    String?  @map("old_value") @db.Text
-  newValue    String?  @map("new_value") @db.Text
-  ipAddress   String   @map("ip_address") @db.VarChar(50)
-  userAgent   String?  @map("user_agent") @db.Text
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  id        Int      @id @default(autoincrement())
+  userId    Int?     @map("user_id")
+  username  String   @db.VarChar(50)
+  action    String   @db.VarChar(50)
+  entity    String   @db.VarChar(50)
+  entityId  Int?     @map("entity_id")
+  oldValue  String?  @map("old_value") @db.Text
+  newValue  String?  @map("new_value") @db.Text
+  ipAddress String   @map("ip_address") @db.VarChar(50)
+  userAgent String?  @map("user_agent") @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
   @@map("audit_log")
   @@index([userId])
